@@ -1,0 +1,51 @@
+[gd_scene load_steps=9 format=3 uid="uid://ben4ppqdjttk8"]
+
+[ext_resource type="Script" uid="uid://620x5g7g420y" path="res://scripts/rigid_player.gd" id="1_rdbbi"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_rdbbi"]
+friction = 0.1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jy6go"]
+albedo_color = Color(1, 1, 0.49019608, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_3vyb7"]
+material = SubResource("StandardMaterial3D_jy6go")
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_g2els"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ryifn"]
+albedo_color = Color(0, 0, 0.4862745, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_u8vuu"]
+material = SubResource("StandardMaterial3D_ryifn")
+size = Vector3(1, 0.03, 3)
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_2cpwa"]
+points = PackedVector3Array(0.5, 0.0150000015, 1.5, 0.5, -0.015, 1.5, 0.5, 0.0150000015, -1.5, -0.5, 0.0150000015, 1.5, -0.5, -0.015, 1.5, 0.5, -0.015, -1.5, -0.5, 0.0150000015, -1.5, -0.5, -0.015, -1.5)
+
+[node name="Snowboarder" type="RigidBody3D"]
+collision_mask = 2
+mass = 70.0
+physics_material_override = SubResource("PhysicsMaterial_rdbbi")
+center_of_mass_mode = 1
+script = ExtResource("1_rdbbi")
+
+[node name="CharacterMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("CapsuleMesh_3vyb7")
+
+[node name="CharacterCollisionShape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_g2els")
+
+[node name="BoardMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
+mesh = SubResource("BoxMesh_u8vuu")
+skeleton = NodePath("")
+
+[node name="BoardCollisionShape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
+shape = SubResource("ConvexPolygonShape3D_2cpwa")
+
+[node name="RayCast3D" type="RayCast3D" parent="."]
+collision_mask = 2

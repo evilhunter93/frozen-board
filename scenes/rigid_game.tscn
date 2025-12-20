@@ -1,0 +1,40 @@
+[gd_scene load_steps=6 format=3 uid="uid://es6n1dmppsog"]
+
+[ext_resource type="PackedScene" uid="uid://ben4ppqdjttk8" path="res://scenes/Player scenes/rigid_player.tscn" id="1_fgk2d"]
+
+[sub_resource type="Environment" id="Environment_yqjtg"]
+background_energy_multiplier = 8.3
+ambient_light_color = Color(1, 1, 1, 1)
+ambient_light_energy = 12.15
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uwrxv"]
+albedo_color = Color(0.6745098, 0.827451, 1, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_lnu2h"]
+material = SubResource("StandardMaterial3D_uwrxv")
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_biciy"]
+points = PackedVector3Array(-1, 0, -1, -1, 0, 1, 1, 0, -1, 1, 0, 1)
+
+[node name="Game" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_yqjtg")
+
+[node name="Level" type="StaticBody3D" parent="."]
+transform = Transform3D(79.86356, -60.181503, 0, 60.181503, 79.86356, 0, 0, 0, 100, 0, 0, 0)
+collision_layer = 2
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Level"]
+layers = 2
+mesh = SubResource("PlaneMesh_lnu2h")
+skeleton = NodePath("../..")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Level"]
+shape = SubResource("ConvexPolygonShape3D_biciy")
+
+[node name="Snowboarder" parent="." instance=ExtResource("1_fgk2d")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.9949026, 0)
+
+[node name="Camera3D" type="Camera3D" parent="Snowboarder"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6046119, 2.9857755)

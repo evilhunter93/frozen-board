@@ -1,0 +1,43 @@
+[gd_scene load_steps=8 format=3 uid="uid://ctb6auncp8s7s"]
+
+[ext_resource type="Script" uid="uid://8pwlkrgymjgl" path="res://scripts/player2.gd" id="1_ryifn"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jy6go"]
+albedo_color = Color(1, 1, 0.49019608, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_3vyb7"]
+material = SubResource("StandardMaterial3D_jy6go")
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_g2els"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ryifn"]
+albedo_color = Color(0, 0, 0.4862745, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_u8vuu"]
+material = SubResource("StandardMaterial3D_ryifn")
+size = Vector3(1, 0.03, 3)
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_2cpwa"]
+points = PackedVector3Array(0.5, 0.0150000015, 1.5, 0.5, -0.015, 1.5, 0.5, 0.0150000015, -1.5, -0.5, 0.0150000015, 1.5, -0.5, -0.015, 1.5, 0.5, -0.015, -1.5, -0.5, 0.0150000015, -1.5, -0.5, -0.015, -1.5)
+
+[node name="Snowboarder2" type="CharacterBody3D"]
+collision_mask = 2
+floor_max_angle = 0.17453292
+script = ExtResource("1_ryifn")
+
+[node name="CharacterMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("CapsuleMesh_3vyb7")
+
+[node name="CharacterCollisionShape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_g2els")
+
+[node name="BoardMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
+mesh = SubResource("BoxMesh_u8vuu")
+skeleton = NodePath("")
+
+[node name="BoardCollisionShape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
+shape = SubResource("ConvexPolygonShape3D_2cpwa")
