@@ -1,14 +1,14 @@
 extends CharacterBody3D
 
 @export var max_speed := 20
-@export var acceleration := 2.0
 @export var max_fall_speed := 30
 @export var max_jump_velocity_y := 10
 @export var max_jump_velocity_z := 2.0
 @export var jump_charge_time := 1.0
 @export var turn_speed := 1.0
 @export var min_speed := 4.0
-@export var drag := 3.0
+@export var drag := 1.0
+@export var side_drag := 3.0
 
 @onready var character_mesh: MeshInstance3D = $CharacterMesh
 
@@ -23,9 +23,11 @@ func _physics_process(delta: float) -> void:
 			character_mesh.global_transform.interpolate_with(character_form, 0.1)
 
 	# Add the gravity and handle acceleration
-	if not is_on_floor() and not is_on_wall():
+	if not is_on_wall():
 		was_in_air = true
 		velocity += get_gravity() * delta
+		if -velocity.y > max_fall_speed:
+			velocity.y = -max_fall_speed
 		
 	if is_on_wall():
 		_slide_velocity(delta)
@@ -45,10 +47,7 @@ func _slide_velocity(delta: float) -> void:
 
 	if was_in_air:
 		was_in_air = false
-		print(velocity)
 		velocity = velocity.slide(wall_normal)
-		print(wall_normal)
-		print(velocity)
 
 	var gravity_direction: Vector3 = get_gravity().normalized()
 	var downhill_direction: Vector3 = gravity_direction.slide(wall_normal).normalized()
@@ -61,14 +60,26 @@ func _slide_velocity(delta: float) -> void:
 	
 	# Apply acceleration to velocity
 	velocity += z_acceleration * delta
-	if velocity.length() > drag * delta:
-		velocity -= drag * velocity.normalized() * delta
+	
+	# Apply forward drag
+	var deceleration = \
+		drag * velocity.project(z_slope_direction).normalized() * delta
+	if velocity.dot(z_slope_direction) > deceleration.length():
+		velocity -= deceleration
 	else:
-		velocity = Vector3.ZERO
+		velocity -= velocity.project(z_slope_direction)
+	
+	# Apply side drag
+	var side_deceleration = \
+		side_drag * velocity.project(downhill_direction).normalized() * delta
+	if velocity.dot(downhill_direction) > side_deceleration.length():
+		velocity -= side_deceleration
+	else:
+		velocity -= velocity.project(downhill_direction)
 
 	if velocity.length() > max_speed:
 		velocity = velocity.normalized() * max_speed
-	
+
 func _jump(delta: float) -> void:
 	if Input.is_action_pressed("charge_jump"):
 		jump_charge = jump_charge + delta \

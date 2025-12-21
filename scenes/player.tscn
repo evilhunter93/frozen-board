@@ -20,8 +20,8 @@ radius = 0.52
 
 [node name="Snowboarder" type="CharacterBody3D"]
 collision_mask = 2
-floor_max_angle = 0.17453292
-floor_snap_length = 0.5
+wall_min_slide_angle = 0.0
+floor_max_angle = 0.0
 script = ExtResource("1_ryifn")
 
 [node name="CharacterMesh" type="MeshInstance3D" parent="."]
