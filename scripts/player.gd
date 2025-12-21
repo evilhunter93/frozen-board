@@ -8,12 +8,14 @@ extends CharacterBody3D
 @export var jump_charge_time := 1.0
 @export var turn_speed := 1.0
 @export var min_speed := 4.0
+@export var drag := 1.0
 
 @onready var character_mesh: MeshInstance3D = $CharacterMesh
 
 const SPEED = 5.0
 var jump_charge := 0.0
 const JUMP_VELOCITY = 4.5
+var was_in_air = true
 
 func _physics_process(delta: float) -> void:
 	var character_form = _align_with_surface(character_mesh.global_transform)
@@ -21,6 +23,7 @@ func _physics_process(delta: float) -> void:
 		character_mesh.global_transform.interpolate_with(character_form, 0.1)
 	# Add the gravity and handle acceleration
 	if not is_on_floor():
+		was_in_air = true
 		velocity += get_gravity() * delta
 		
 	if is_on_floor():
@@ -39,18 +42,26 @@ func _physics_process(delta: float) -> void:
 func _slide_velocity(delta: float) -> void:
 	var floor_normal = get_floor_normal()
 
+	if was_in_air:
+		was_in_air = false
+		velocity = velocity.slide(floor_normal)
+
 	var gravity_direction: Vector3 = get_gravity().normalized()
 	var downhill_direction: Vector3 = gravity_direction.slide(floor_normal).normalized()
-	print("Downhill Direction:", downhill_direction)
 	# Calculate acceleration along the slope
 	var slope_acceleration: Vector3 = downhill_direction * get_gravity().length()
 	
 	var z_direction: Vector3 = (-global_basis.z).normalized()
 	var z_slope_direction: Vector3 = z_direction.slide(floor_normal).normalized()
 	var z_acceleration: Vector3 = slope_acceleration.project(z_slope_direction)
-
+	
 	# Apply acceleration to velocity
 	velocity += z_acceleration * delta
+	if velocity.length() > drag * delta:
+		velocity -= drag * velocity.normalized() * delta
+	else:
+		velocity = Vector3.ZERO
+
 	if velocity.length() > max_speed:
 		velocity = velocity.normalized() * max_speed
 	
