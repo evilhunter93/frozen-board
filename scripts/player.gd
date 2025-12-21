@@ -9,22 +9,26 @@ extends CharacterBody3D
 @export var turn_speed := 1.0
 @export var min_speed := 4.0
 
+@onready var character_mesh: MeshInstance3D = $CharacterMesh
+
 const SPEED = 5.0
 var jump_charge := 0.0
 const JUMP_VELOCITY = 4.5
 
 func _physics_process(delta: float) -> void:
-	global_transform = global_transform.interpolate_with(_align_with_surface(global_transform), 0.1)
+	var character_form = _align_with_surface(character_mesh.global_transform)
+	character_mesh.global_transform = \
+		character_mesh.global_transform.interpolate_with(character_form, 0.1)
 	# Add the gravity and handle acceleration
-	if not is_on_floor() :
+	if not is_on_floor():
 		velocity += get_gravity() * delta
 		
-	if is_on_wall():
+	if is_on_floor():
 		_slide_velocity(delta)
 	
 
 	# Get the input direction and handle the movement.
-	var steering := Input.get_axis("steer_left", "steer_right")
+	var steering := Input.get_axis("steer_right", "steer_left")
 	rotate_y(steering * turn_speed * delta)
 
 	# Handle jump.
@@ -33,29 +37,20 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 func _slide_velocity(delta: float) -> void:
-	# Find positive forward acceleration
-	var forward_mult = Vector3.DOWN.dot(-global_basis.z.normalized())
-	var forward_acc = forward_mult * 9.82
-	
-	# Define drag for deceleration
-	var drag = 5
-	var drag_mult = 1 if velocity.z > 0 else -1
-	
-	# Compute z velocity
-	var velocity_dragless = velocity.z - forward_acc * delta
-	if abs(velocity_dragless) < drag * delta:
-		velocity = Vector3.ZERO
-	else:
-		velocity = Vector3(0, 0, forward_acc - drag * drag_mult)
-	
+	var floor_normal = get_floor_normal()
 
-	# Add a minimum down speed on walls
-	var slope_direction = Vector3.DOWN.slide(get_wall_normal().normalized()).normalized()
-	var slope_speed = velocity.dot(slope_direction)
-	if slope_speed < min_speed:
-		velocity += slope_direction * min_speed * delta
+	var gravity_direction: Vector3 = get_gravity().normalized()
+	var downhill_direction: Vector3 = gravity_direction.slide(floor_normal).normalized()
+	print("Downhill Direction:", downhill_direction)
+	# Calculate acceleration along the slope
+	var slope_acceleration: Vector3 = downhill_direction * get_gravity().length()
+	
+	var z_direction: Vector3 = (-global_basis.z).normalized()
+	var z_slope_direction: Vector3 = z_direction.slide(floor_normal).normalized()
+	var z_acceleration: Vector3 = slope_acceleration.project(z_slope_direction)
 
-	# Cap speed
+	# Apply acceleration to velocity
+	velocity += z_acceleration * delta
 	if velocity.length() > max_speed:
 		velocity = velocity.normalized() * max_speed
 	
@@ -83,7 +78,6 @@ func _align_with_surface(xform: Transform3D):
 		normal = Vector3.UP
 
 	xform.basis.y = normal
-	xform.basis.x = xform.basis.z.cross(normal)
+	xform.basis.x = -xform.basis.z.cross(normal)
 	xform.basis = xform.basis.orthonormalized()
-	
 	return xform

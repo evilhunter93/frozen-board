@@ -35,6 +35,3 @@ shape = SubResource("ConvexPolygonShape3D_uwrxv")
 
 [node name="Snowboarder" parent="." instance=ExtResource("1_uwrxv")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 60.07391, 0)
-
-[node name="Camera3D" type="Camera3D" parent="Snowboarder"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1492767, 3.3732944)
