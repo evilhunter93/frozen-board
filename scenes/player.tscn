@@ -18,7 +18,7 @@ size = Vector3(1, 0.03, 3)
 [sub_resource type="SphereShape3D" id="SphereShape3D_ryifn"]
 radius = 0.52
 
-[node name="Snowboarder2" type="CharacterBody3D"]
+[node name="Snowboarder" type="CharacterBody3D"]
 collision_mask = 2
 floor_snap_length = 0.5
 script = ExtResource("1_ryifn")
