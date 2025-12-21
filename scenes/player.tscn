@@ -23,6 +23,7 @@ collision_mask = 2
 wall_min_slide_angle = 0.0
 floor_max_angle = 0.0
 script = ExtResource("1_ryifn")
+forward_drag = 1.0
 
 [node name="CharacterMesh" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
