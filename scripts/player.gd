@@ -16,6 +16,10 @@ const SPEED = 5.0
 var jump_charge := 0.0
 
 func _physics_process(delta: float) -> void:
+	if Input.is_action_just_pressed("restart"):
+		get_tree().reload_current_scene()
+		return
+	
 	if is_on_floor() or is_on_wall():
 		var character_form = _align_with_surface(character_mesh.global_transform)
 		character_mesh.global_transform = \
@@ -93,10 +97,13 @@ func _jump(delta: float) -> void:
 		jump_charge = jump_charge + delta \
 			if jump_charge < jump_charge_time \
 			else jump_charge_time
-	
+
 	if Input.is_action_just_released("charge_jump"):
-		if is_on_floor() or is_on_wall():
+		if is_on_floor() or is_on_wall():		
+			var z_direction: Vector3 = (-global_basis.z).normalized()
+			if abs((velocity * z_direction).length()) < min_speed:
+				velocity += max_jump_velocity_z * (z_direction) \
+					* (jump_charge / jump_charge_time)
+
 			velocity.y = max_jump_velocity_y * (jump_charge / jump_charge_time)
-			if abs(velocity.z) < min_speed:
-				velocity.z -= max_jump_velocity_z * (jump_charge / jump_charge_time)
 		jump_charge = 0
